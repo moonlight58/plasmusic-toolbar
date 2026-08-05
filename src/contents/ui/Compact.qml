@@ -33,11 +33,12 @@ Item {
     readonly property bool useImageColors: panelIcon.imageReady && panelIcon.type == PanelIcon.Type.Image && colorsFromAlbumCover
     readonly property color imageColor: useImageColors ? panelIcon.imageColor : Kirigami.Theme.textColor
     readonly property color backgroundColorFromImage: Kirigami.ColorUtils.tintWithAlpha(imageColor, "black", 0.5)
-    property color backgroundColor: useImageColors ? backgroundColorFromImage : "transparent"
-    readonly property var backgroundColorBrightness: Kirigami.ColorUtils.brightnessForColor(backgroundColor)
-    readonly property color contrastColor: backgroundColorBrightness === Kirigami.ColorUtils.Dark ? "white" : "black"
-    readonly property color foregroundColorFromImage: Kirigami.ColorUtils.tintWithAlpha(imageColor, contrastColor, .6)
-    property color foregroundColor: useImageColors ? foregroundColorFromImage : Kirigami.Theme.textColor
+    readonly property color nothingGold: "#D4AF37"
+    readonly property color nothingBlack: "#0A0A0A"
+    readonly property color nothingWhite: "#F5F5F5"
+
+    property color backgroundColor: nothingBlack
+    property color foregroundColor: nothingWhite
 
     Behavior on backgroundColor {
         ColorAnimation {
