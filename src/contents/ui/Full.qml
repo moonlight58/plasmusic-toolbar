@@ -183,9 +183,10 @@ Item {
         Layout.rightMargin:  16
         Layout.bottomMargin: 2
         text:  player.title
+        font.family: "Flight"
         color: root.nothingWhite
         font.bold: true
-        font.pixelSize: 15
+        font.pixelSize: 25
         elide: Text.ElideRight
       }
 
@@ -197,6 +198,7 @@ Item {
         Layout.rightMargin:  16
         Layout.bottomMargin: 10
         text: (Array.isArray(player.artists) ? player.artists.join(", ") : player.artists) + (player.album ? " — " + player.album : "")
+        font.family: "Nothing Font (5x7)"
         color: root.nothingWhite
         font.pixelSize: 13
         elide: Text.ElideRight
