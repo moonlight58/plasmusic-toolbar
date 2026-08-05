@@ -1,98 +1,90 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import org.kde.plasma.components as PlasmaComponents3
-import org.kde.coreaddons 1.0 as KCoreAddons
 
 Item {
-    property double songPosition: 0;  // Last song position detected in microseconds
-    property double songLength: 0;  // Length of the entire song in microseconds;
-    property bool playing: false;
-    property alias enableChangePosition: timeTrackSlider.enabled;
-    property alias refreshInterval: timer.interval;
-    signal requireChangePosition(position: double);
-    signal requireUpdatePosition();
-
-    Layout.preferredHeight: column.implicitHeight
-    Layout.fillWidth: true
-
     id: container
 
+    property double songPosition: 0   // microseconds
+    property double songLength:   0   // microseconds
+    property bool   playing:      false
+    property bool   enableChangePosition: true
+
+    signal requireChangePosition(position: double)
+    signal requireUpdatePosition()
+
+    // Colours — override from parent if needed
+    property color trackColor:    Qt.rgba(1, 1, 1, 0.25)   // dim white track
+    property color fillColor:     "#D4AF37"                  // gold fill
+    property color handleColor:   "#FFFFFF"                  // white dot handle
+    property real  barHeight:     4
+    property real  handleRadius:  6
+
+    Layout.preferredHeight: barHeight + handleRadius * 2
+    Layout.fillWidth: true
+
+    // Internal progress, 0.0 – 1.0
+    readonly property double _progress: container.songLength > 0
+        ? Math.min(container.songPosition / container.songLength, 1.0)
+        : 0.0
+
+    // ── Auto-advance timer ─────────────────────────────────────────────────
     Timer {
         id: timer
-        interval: 200;
-        running: container.playing && !timeTrackSlider.pressed && !timeTrackSlider.changingPosition;
-        repeat: true
-        onTriggered: () => {
-            container.requireUpdatePosition()
-        }
+        interval: 200
+        running:  container.playing && !dragArea.pressed
+        repeat:   true
+        onTriggered: container.requireUpdatePosition()
     }
 
-    ColumnLayout {
-        id: column
-        width: parent.width
-        spacing: 0
+    // ── Track background ───────────────────────────────────────────────────
+    Rectangle {
+        id: track
+        anchors.verticalCenter: parent.verticalCenter
+        width:  parent.width
+        height: container.barHeight
+        radius: height / 2
+        color:  container.trackColor
+    }
 
-        PlasmaComponents3.Slider {
-            id: timeTrackSlider
+    // ── Filled portion ─────────────────────────────────────────────────────
+    Rectangle {
+        id: fill
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: track.left
+        width:  track.width * container._progress
+        height: container.barHeight
+        radius: height / 2
+        color:  container.fillColor
+    }
 
-            Layout.fillWidth: true
-            value: container.songPosition / container.songLength
-            property bool changingPosition: false
+    // ── Handle dot ─────────────────────────────────────────────────────────
+    Rectangle {
+        id: handle
+        anchors.verticalCenter: parent.verticalCenter
+        x: Math.max(0, Math.min(
+               fill.width - container.handleRadius,
+               track.width * container._progress - container.handleRadius))
+        width:  container.handleRadius * 2
+        height: container.handleRadius * 2
+        radius: container.handleRadius
+        color:  container.handleColor
+        visible: container.songLength > 0
+    }
 
-            onPressedChanged: () => {
-                if (!pressed) {
-                    timeTrackSlider.moved()
-                }
-            }
-            onMoved: {
-                if (pressed) {
-                    return
-                }
+    // ── Drag / seek ────────────────────────────────────────────────────────
+    MouseArea {
+        id: dragArea
+        anchors.fill: parent
+        enabled: container.enableChangePosition && container.songLength > 0
+        cursorShape: Qt.PointingHandCursor
 
-                changingPosition = true
-                const targetPosition = timeTrackSlider.value * container.songLength
-                if (targetPosition != container.songPosition) {
-                    container.requireChangePosition(targetPosition)
-                }
-                changingPosition = false
-            }
-
-            // Disable the slider events when songLength is 0 or less
-            Loader {
-                anchors.fill: parent
-                sourceComponent: container.songLength <= 0 ? sliderDisabler : null
-                Component {
-                    id: sliderDisabler
-                    MouseArea {
-                        onWheel: (wheel) => { wheel.accepted = true }
-                        onClicked: (mouse) => { mouse.accepted = true }
-                        onPressed: (mouse) => { mouse.accepted = true }
-                    }
-                }
-            }
+        function seek(mouseX) {
+            const ratio = Math.max(0, Math.min(mouseX / track.width, 1.0))
+            container.requireChangePosition(ratio * container.songLength)
         }
 
-        RowLayout {
-            Layout.preferredWidth: parent.width
-            id: timeLabels
-            function formatDuration(duration) {
-                if (container.songLength <= 0) {
-                    return "-:--"
-                }
-
-                const hideHours = container.songLength < 3600000000 // 1 hour in microseconds
-                const durationFormatOption = hideHours ? KCoreAddons.FormatTypes.FoldHours : KCoreAddons.FormatTypes.DefaultDuration
-                return KCoreAddons.Format.formatDuration(duration / 1000, durationFormatOption)
-            }
-
-            PlasmaComponents3.Label {
-                Layout.alignment: Qt.AlignLeft
-                text: timeLabels.formatDuration(container.songPosition)
-            }
-            PlasmaComponents3.Label {
-                Layout.alignment: Qt.AlignRight
-                text: timeLabels.formatDuration(container.songLength - container.songPosition)
-            }
-        }
+        onPressed:      (mouse) => seek(mouse.x)
+        onPositionChanged: (mouse) => { if (pressed) seek(mouse.x) }
     }
 }

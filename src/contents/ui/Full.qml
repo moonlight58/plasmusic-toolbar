@@ -192,7 +192,7 @@ Item {
                     source:  "media-skip-backward"
                     bgColor: "#2B2D32"
                     iconColorOverride: root.nothingWhite
-                    padding: 8
+                    padding: 9
                     onClicked: player.previous()
                 }
 
@@ -205,7 +205,7 @@ Item {
                     source:  "media-skip-forward"
                     bgColor: "#2B2D32"
                     iconColorOverride: root.nothingWhite
-                    padding: 8
+                    padding: 9
                     onClicked: player.next()
                 }
             }
