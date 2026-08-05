@@ -11,7 +11,7 @@ PlasmoidItem {
     id: widget
 
     Plasmoid.status: (showWhenNoMedia || player.ready) ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.HiddenStatus
-    Plasmoid.backgroundHints: plasmoid.configuration.desktopWidgetBg
+    Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
 
     readonly property int formFactor: Plasmoid.formFactor
     readonly property int location: Plasmoid.location
