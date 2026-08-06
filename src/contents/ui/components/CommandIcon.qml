@@ -12,7 +12,7 @@ Item {
   property color bgColor: "transparent"
   property real extraWidth: 0
   property real padding: Kirigami.Units.smallSpacing * 1.5
-  property string iconColorOverride: ""
+  property color iconColorOverride: "transparent"
   signal clicked()
 
   readonly property real boxHeight: size + padding * 2
@@ -37,7 +37,7 @@ Item {
     anchors.centerIn: parent
     width: Kirigami.Units.iconSizes.small
     height: width
-    color: iconColorOverride !== "" ? iconColorOverride : (container.active ? "#D4AF37" : "#F5F5F5") 
+    color: iconColorOverride !== "transparent" ? iconColorOverride : (container.active ? "#D4AF37" : "#F5F5F5") 
   }
 
   MouseArea {

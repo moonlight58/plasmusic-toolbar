@@ -47,7 +47,7 @@ Item {
   // ── Palette ────────────────────────────────────────────────────────────
   readonly property color nothingBlack: "#0A0A0A"
   readonly property color nothingWhite: "#F5F5F5"
-  readonly property color nothingGold:  "#D4AF37"
+  readonly property color nothingGold:  "#FFDF7D"
 
   // ── Outer dark border card ─────────────────────────────────────────────
   Rectangle {
