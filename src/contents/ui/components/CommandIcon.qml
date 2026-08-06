@@ -37,6 +37,7 @@ Item {
     anchors.centerIn: parent
     width: Kirigami.Units.iconSizes.small
     height: width
+    isMask: true
     color: iconColorOverride !== "transparent" ? iconColorOverride : (container.active ? "#D4AF37" : "#F5F5F5") 
   }
 
